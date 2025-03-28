@@ -13,7 +13,7 @@ RUN npm install -g ts-node && npm install
 COPY . .
 
 # Открываем нужный порт (если бот использует веб-сервер)
-EXPOSE 3000
+EXPOSE 4000
 
 # Команда для запуска бота
 CMD ["npm", "run", "start"]

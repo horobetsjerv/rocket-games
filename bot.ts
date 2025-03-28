@@ -1190,7 +1190,7 @@ bot.action(Actions.LESSDICE, async (ctx) => {
   const gameSession = new GameSession(user, GAMES.DICE);
   gameSession.startGame(ctx);
 });
-const PORT = 3000;
+const PORT = 4000;
 app.listen(PORT, () => {
   console.log(`Сервер запущен на порту ${PORT}`);
 });
