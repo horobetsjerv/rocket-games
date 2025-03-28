@@ -9,6 +9,9 @@ services:
       - "4000:4000"
     depends_on:
       - db
+  dns:
+    - 8.8.8.8
+    - 8.8.4.4
 
   db:
     image: postgres:13
