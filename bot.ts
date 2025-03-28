@@ -19,22 +19,40 @@ const pool = new Pool({
 });
 
 async function initDatabase() {
-  try {
-    await pool.query(`
-      CREATE TABLE users (
-        user_id BIGINT PRIMARY KEY,
-        selected_mines_count VARCHAR(10) DEFAULT '3',
-        nav_state VARCHAR(50) DEFAULT 'mainMenu',
-        bet NUMERIC(10, 2) DEFAULT 0.0,
-        selected_dice_type VARCHAR(10) DEFAULT 'even',
-        balance NUMERIC(10, 2) DEFAULT 0.00,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-);
-    `);
-    console.log("Таблица 'users' успешно создана или уже существует");
-  } catch (err) {
-    console.error("Ошибка при создании таблицы:", err);
+  const maxRetries = 10;
+  let retries = 0;
+
+  while (retries < maxRetries) {
+    try {
+      await pool.query("SELECT 1"); // Простой запрос для проверки соединения
+      console.log("Подключение к базе данных установлено");
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+          user_id BIGINT PRIMARY KEY,
+          selected_mines_count VARCHAR(10) DEFAULT '3',
+          nav_state VARCHAR(50) DEFAULT 'mainMenu',
+          bet NUMERIC(10, 2) DEFAULT 0.0,
+          selected_dice_type VARCHAR(10) DEFAULT 'even',
+          balance NUMERIC(10, 2) DEFAULT 0.00,
+          created_at TIMESTAMP DEFAULT NOW(),
+          updated_at TIMESTAMP DEFAULT NOW()
+        );
+      `);
+      console.log("Таблица 'users' успешно создана или уже существует");
+      break; // Выходим из цикла, если всё ок
+    } catch (err) {
+      retries++;
+      console.error(
+        `Ошибка подключения к базе данных (попытка ${retries}/${maxRetries}):`,
+        err
+      );
+      if (retries === maxRetries) {
+        throw new Error(
+          "Не удалось подключиться к базе данных после всех попыток"
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Ждём 2 секунды перед повторной попыткой
+    }
   }
 }
 
