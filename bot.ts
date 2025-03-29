@@ -1210,7 +1210,7 @@ bot.action(Actions.LESSDICE, async (ctx) => {
 });
 const PORT = 4000;
 app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
+  console.log(`Сервер запущен на по))ту ${PORT}`);
 });
 bot.launch();
-console.log("🤖 Бот запущен!");
+console.log("🤖 Бот запущен! :))");
