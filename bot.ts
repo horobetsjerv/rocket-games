@@ -479,11 +479,15 @@ class UserSession {
       ]);
       if (res.rows.length > 0) {
         const data = res.rows[0];
-        this.selectedMinesCount = data.selected_mines_count;
-        this.navstate = data.nav_state;
-        this.bet = parseFloat(data.bet);
-        this.selectedDiceType = data.selected_dice_type as DICEGAMETYPES;
-        this.balance = parseFloat(data.balance);
+        this.selectedMinesCount = data.selected_mines_count || "3";
+        this.navstate = data.nav_state || NAVSTATES.MAINMENU; // Если в БД нет, используем MAINMENU
+        this.bet = parseFloat(data.bet) || 0;
+        this.selectedDiceType =
+          (data.selected_dice_type as DICEGAMETYPES) || DICEGAMETYPES.EVEN;
+        this.balance = parseFloat(data.balance) || 0;
+      } else {
+        // Если пользователя нет в БД, сохраняем с дефолтными значениями
+        await this.save();
       }
     } catch (err) {
       console.error("Ошибка загрузки пользователя:", err);
@@ -1212,5 +1216,19 @@ const PORT = 4000;
 app.listen(PORT, () => {
   console.log(`Сервер запущен на по))ту ${PORT}`);
 });
-bot.launch();
-console.log("🤖 Бот запущен! :))");
+
+bot.catch((err, ctx) => {
+  console.error(`Ошибка для ${ctx.updateType}:`, err);
+  ctx.reply(
+    "Произошла ошибка. Попробуйте снова, введите команду /start или обратитесь в поддержку."
+  );
+});
+
+bot
+  .launch()
+  .then(() => {
+    console.log("🤖 Бот запущен! :))");
+  })
+  .catch((err) => {
+    console.error("Ошибка при запуске бота:", err);
+  });
