@@ -2,9 +2,16 @@ const { Telegraf } = require("telegraf");
 
 const token = "7575965565:AAH4HeABBMFLTDK6f2mRjXuRwGc_PrB3DZo";
 const bot = new Telegraf(token);
+const getRandomInterval = () => {
+  const min = 13 * 60 * 1000; // 13 минут
+  const max = 3.5 * 60 * 60 * 1000; // 3.5 часа
 
+  return Math.floor(Math.random() * (max - min + 1)) + min; // генерирует случайное число в пределах от min до max
+};
+
+const randomSendInterval = getRandomInterval();
 const activeTimers = {};
-const SEND_INTERVAL = 30 * 1000;
+const SEND_INTERVAL = 33 * 60 * 1000;
 
 // Укажите username канала
 const channelChatId = "@rocketgamesbet"; // Ваш канал
@@ -106,8 +113,10 @@ bot.command("startSend", (ctx) => {
     bot.telegram.sendMessage(channelChatId, generateRandomMessage(), {
       parse_mode: "MarkdownV2",
     });
-  }, SEND_INTERVAL);
+  }, randomSendInterval);
 });
+
+console.log(randomSendInterval);
 
 // Команда для остановки
 bot.command("stopSend", (ctx) => {
