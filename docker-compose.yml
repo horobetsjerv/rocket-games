@@ -1,12 +1,26 @@
 version: "3.8"
 
 services:
+
+
+
   backend:
     build:
       context: ./
       dockerfile: Dockerfile
     ports:
       - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+betbot:
+    build:
+      context: ./
+      dockerfile: Dockerfile.betbot
     depends_on:
       db:
         condition: service_healthy

@@ -1,0 +1,10 @@
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install -g ts-node && npm install
+
+COPY betbot.js ./
+
+CMD ["node", "betbot.js"]
