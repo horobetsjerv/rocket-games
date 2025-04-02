@@ -4,10 +4,10 @@ const token = "7575965565:AAH4HeABBMFLTDK6f2mRjXuRwGc_PrB3DZo";
 const bot = new Telegraf(token);
 
 const activeTimers = {};
-const SEND_INTERVAL = 43 * 60 * 1000;
+const SEND_INTERVAL = 30 * 1000;
 
 // Укажите username канала
-const channelChatId = "@https://t.me/rocketgamesbet"; // Ваш канал
+const channelChatId = "@rocketgamesbet"; // Ваш канал
 
 const namesMocks = [
   "M",
