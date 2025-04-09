@@ -39,6 +39,31 @@ async function initDatabase() {
         );
       `);
       console.log("Таблица 'users' успешно создана или уже существует");
+
+      await pool.query(`
+        ALTER TABLE users
+        ADD COLUMN IF NOT EXISTS referrer_id BIGINT,
+        ADD COLUMN IF NOT EXISTS referral_link VARCHAR(100) UNIQUE,
+        FOREIGN KEY (referrer_id) REFERENCES users(user_id)
+      `);
+      console.log("Поля для реферальной системы добавлены или уже существуют");
+
+      // Создаем таблицу для хранения информации о реферальных ссылках
+      await pool.query(`
+  CREATE TABLE IF NOT EXISTS referral_links (
+    id SERIAL PRIMARY KEY,  -- Уникальный ID записи
+    referral_link VARCHAR(100) UNIQUE,  -- Реферальная ссылка
+    user_id BIGINT NOT NULL,  -- ID пользователя, который зарегистрировался
+    referred_by BIGINT,  -- ID пользователя, который пригласил (реферер)
+    created_at TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (user_id) REFERENCES users(user_id),  -- Внешний ключ на таблицу пользователей
+    FOREIGN KEY (referred_by) REFERENCES users(user_id)  -- Внешний ключ на таблицу пользователей (тот, кто пригласил)
+  );
+`);
+      console.log(
+        "Таблица 'referral_links' успешно создана или уже существует"
+      );
+
       break; // Выходим из цикла, если всё ок
     } catch (err) {
       retries++;
