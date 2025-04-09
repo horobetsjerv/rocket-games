@@ -41,10 +41,14 @@ async function initDatabase() {
       console.log("Таблица 'users' успешно создана или уже существует");
 
       await pool.query(`
-        ALTER TABLE users
-        ADD COLUMN IF NOT EXISTS referrer_id BIGINT,
-        ADD COLUMN IF NOT EXISTS referral_link VARCHAR(100) UNIQUE,
-        FOREIGN KEY (referrer_id) REFERENCES users(user_id)
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS referrer_id BIGINT,
+ADD COLUMN IF NOT EXISTS referral_link VARCHAR(100) UNIQUE;
+
+ALTER TABLE users
+ADD CONSTRAINT fk_referrer
+FOREIGN KEY (referrer_id) REFERENCES users(user_id);
+
       `);
       console.log("Поля для реферальной системы добавлены или уже существуют");
 
