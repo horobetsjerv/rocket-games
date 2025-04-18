@@ -162,7 +162,7 @@ async function initDatabase() {
           user_id BIGINT REFERENCES users(user_id),
           amount DECIMAL(12, 2) NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-          `);
+        )`);
       } catch (err) {
         console.error(
           `Ошибка при создании таблицы deposits (попытка ${retries}/${maxRetries}):`,
