@@ -60,7 +60,7 @@ async function initDatabase() {
 
       await pool.query(`
         ALTER TABLE users
-        ADD COLUMN IF NOT EXISTS refprocent BIGINT DEFAULT 10,
+        ADD COLUMN IF NOT EXISTS refprocent BIGINT DEFAULT 10;
           `);
 
       console.log("Поля для реферальной системы добавлены или уже существуют");
