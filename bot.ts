@@ -111,7 +111,7 @@ async function initDatabase() {
           user_id BIGINT REFERENCES users(user_id), 
           sum NUMERIC(10, 2),
           status VARCHAR(20) DEFAULT 'pending',
-          created_at TIMESTAMP DEFAULT NOW(),
+          created_at TIMESTAMP DEFAULT NOW()
         )`);
       } catch (err) {
         console.error(
