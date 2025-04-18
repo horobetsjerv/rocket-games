@@ -132,29 +132,29 @@ bot.action(Actions.AllUsers, async (ctx) => {
       },
     }
   );
-
-  // Markup.inlineKeyboard([
-  //   [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
-  // ]);
-
-  const PORT = 5000;
-  app.listen(PORT, () => {
-    console.log(`Сервер запущен на по))ту ${PORT}`);
-  });
-
-  bot.catch((err, ctx) => {
-    console.error(`Ошибка для ${ctx.updateType}:`, err);
-    ctx.reply(
-      "Произошла ошибка. Попробуйте снова, введите команду /start или обратитесь в поддержку."
-    );
-  });
-
-  bot
-    .launch()
-    .then(() => {
-      console.log("🤖 Admin Бот запущен! :)");
-    })
-    .catch((err) => {
-      console.error("Ошибка при запуске бота:", err);
-    });
 });
+
+// Markup.inlineKeyboard([
+//   [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
+// ]);
+
+const PORT = 5000;
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на по))ту ${PORT}`);
+});
+
+bot.catch((err, ctx) => {
+  console.error(`Ошибка для ${ctx.updateType}:`, err);
+  ctx.reply(
+    "Произошла ошибка. Попробуйте снова, введите команду /start или обратитесь в поддержку."
+  );
+});
+
+bot
+  .launch()
+  .then(() => {
+    console.log("🤖 Admin Бот запущен! :)");
+  })
+  .catch((err) => {
+    console.error("Ошибка при запуске бота:", err);
+  });
