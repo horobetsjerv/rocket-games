@@ -98,41 +98,63 @@ bot.action(Actions.AllUsers, async (ctx) => {
   const users = await pool.query(
     "SELECT * FROM users WHERE created_at >= NOW() - INTERVAL '1 day'"
   );
+
   ctx.editMessageText(
-    `🧘 Все пользователи\n\n` +
+    `🧘 *Все пользователи*\n\n` +
       users.rows
-        .map(
-          (user) =>
-            `ID: ${user?.id}, Ник: ${user.username}, Баланс: ${
-              user.balance
-            }, Дата создания: ${user.created_at}, Приглашен: ${
-              user?.referrer_id ? user?.refferal.id : "Нет"
-            }`
-        )
-        .join("\n")
-  ),
-    Markup.inlineKeyboard([
-      [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
-    ]);
-});
+        .map((user) => {
+          // Форматируем дату
+          const formattedDate = new Date(user.created_at).toLocaleString(
+            "en-US",
+            {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          );
 
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`Сервер запущен на по))ту ${PORT}`);
-});
-
-bot.catch((err, ctx) => {
-  console.error(`Ошибка для ${ctx.updateType}:`, err);
-  ctx.reply(
-    "Произошла ошибка. Попробуйте снова, введите команду /start или обратитесь в поддержку."
+          return (
+            `*ID:* ${user?.id}\n` +
+            `*Баланс:* ${user.balance} USDT\n` +
+            `*Дата создания:* ${formattedDate}\n` +
+            `*Приглашен:* ${user?.referrer_id ? user?.refferal.id : "Нет"}\n` +
+            `\n━━━━━━━━━━━━━━━━━━\n`
+          );
+        })
+        .join("\n"),
+    {
+      parse_mode: "Markdown", // Указываем, что используем Markdown
+      reply_markup: {
+        inline_keyboard: [
+          [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
+        ],
+      },
+    }
   );
-});
 
-bot
-  .launch()
-  .then(() => {
-    console.log("🤖 Admin Бот запущен! :)");
-  })
-  .catch((err) => {
-    console.error("Ошибка при запуске бота:", err);
+  // Markup.inlineKeyboard([
+  //   [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
+  // ]);
+
+  const PORT = 5000;
+  app.listen(PORT, () => {
+    console.log(`Сервер запущен на по))ту ${PORT}`);
   });
+
+  bot.catch((err, ctx) => {
+    console.error(`Ошибка для ${ctx.updateType}:`, err);
+    ctx.reply(
+      "Произошла ошибка. Попробуйте снова, введите команду /start или обратитесь в поддержку."
+    );
+  });
+
+  bot
+    .launch()
+    .then(() => {
+      console.log("🤖 Admin Бот запущен! :)");
+    })
+    .catch((err) => {
+      console.error("Ошибка при запуске бота:", err);
+    });
+});
