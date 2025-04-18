@@ -8,8 +8,7 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     dns:
       - 8.8.8.8
       - 8.8.4.4
@@ -19,8 +18,7 @@ services:
       context: ./
       dockerfile: Dockerfile.adminbot
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     dns:
       - 8.8.8.8
       - 8.8.4.4
@@ -30,8 +28,7 @@ services:
       context: ./
       dockerfile: Dockerfile.betbot
     depends_on:
-      db:
-        condition: service_healthy
+      - db
     dns:
       - 8.8.8.8
       - 8.8.4.4
