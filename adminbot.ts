@@ -103,10 +103,10 @@ bot.action(Actions.AllUsers, async (ctx) => {
       users.rows
         .map(
           (user) =>
-            `ID: ${user.id}, Ник: ${user.username}, Баланс: ${
+            `ID: ${user?.id}, Ник: ${user.username}, Баланс: ${
               user.balance
             }, Дата создания: ${user.created_at}, Приглашен: ${
-              user?.refferal.id ? user?.refferal.id : "Нет"
+              user?.referrer_id ? user?.refferal.id : "Нет"
             }`
         )
         .join("\n")
