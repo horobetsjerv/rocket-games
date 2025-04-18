@@ -161,7 +161,7 @@ async function initDatabase() {
           id SERIAL PRIMARY KEY,
           user_id BIGINT REFERENCES users(user_id),
           amount DECIMAL(12, 2) NOT NULL,
-          created_at TIMESTAMP DEFAULT CUfRRENT_TIMESTAMP;
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
           `);
       } catch (err) {
         console.error(
