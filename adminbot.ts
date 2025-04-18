@@ -131,7 +131,7 @@ bot.catch((err, ctx) => {
 bot
   .launch()
   .then(() => {
-    console.log("🤖 Admin Бот запущен! :))");
+    console.log("🤖 Admin Бот запущен! :)");
   })
   .catch((err) => {
     console.error("Ошибка при запуске бота:", err);
