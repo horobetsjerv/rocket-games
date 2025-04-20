@@ -36,7 +36,6 @@ async function initDatabase() {
       console.log("Подключение к базе данных установлено");
       await pool.query(`
         CREATE TABLE IF NOT EXISTS users (
-          id SERIAL PRIMARY KEY,
           user_id BIGINT PRIMARY KEY,
           selected_mines_count VARCHAR(10) DEFAULT '3',
           nav_state VARCHAR(50) DEFAULT 'mainMenu',
@@ -676,12 +675,15 @@ class UserSession {
   }
 
   async save() {
+    console.log("userrId", this.userId);
+    console.log(typeof this.userId);
+    const safeReferrerId = this.referrer_id === "" ? null : this.referrer_id;
     try {
       await query(
         `
         INSERT INTO users 
-          (user_id, selected_mines_count, nav_state, bet, selected_dice_type, balance)
-        VALUES ($1, $2, $3, $4, $5, $6)
+          (user_id, selected_mines_count, nav_state, bet, selected_dice_type, balance, refprocent)
+        VALUES ($1, $2, $3, $4, $5, $6, $9)
         ON CONFLICT (user_id) DO UPDATE SET
           selected_mines_count = $2,
           nav_state = $3,
@@ -690,7 +692,9 @@ class UserSession {
           balance = $6,
           referral_link = $7,
           referrer_id = $8,
+          refprocent = $9,
           updated_at = NOW()
+          
       `,
         [
           this.userId,
@@ -700,7 +704,8 @@ class UserSession {
           this.selectedDiceType,
           this.balance,
           this.referral_link,
-          this.referrer_id,
+          safeReferrerId,
+          this.refprocent,
         ]
       );
       console.log("Сохранен успешно");
@@ -765,7 +770,7 @@ class UserSession {
           ])
         );
       } catch (err) {
-        console.error("Ошибка сохранения пользователя:", err);
+        console.error("Ошибка вывода :", err);
       }
 
       // SSS

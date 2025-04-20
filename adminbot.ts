@@ -1,3 +1,4 @@
+import Decimal from "decimal.js";
 import { Pool } from "pg";
 import { Context, Markup, Telegraf } from "telegraf";
 const token = "7622229101:AAELYXDJvJfAHkF9IuTx4IpNcZqvOe2VrU8";
@@ -51,6 +52,7 @@ enum NavStates {
 }
 
 let currentNavState = NavStates.MainMenu;
+let changedBalanceUserId: any;
 
 // FUNCS GEN MENUS
 function mainMenu() {
@@ -132,7 +134,7 @@ bot.action(Actions.TodayUsers, async (ctx) => {
             `*ID:* ${user?.user_id}\n` +
             `*Баланс:* ${user.balance} USDT\n` +
             `*Дата создания:* ${formattedDate}\n` +
-            `*Приглашен:* ${user?.referrer_id ? user?.refferal.id : "Нет"}\n` +
+            `*Приглашен:* ${user?.referrer_id ? user?.referrer_id : "Нет"}\n` +
             `\n━━━━━━━━━━━━━━━━━━\n`
           );
         })
@@ -215,14 +217,17 @@ bot.action(Actions.ChangeUserBalance, async (ctx) => {
 
 //MAKE HERE
 bot.hears(/^\d+$/, async (ctx) => {
-  const userId = Number(ctx.match[0]);
+  if (currentNavState === NavStates.ChangeUserBalance) {
+    changedBalanceUserId = Number(ctx.match[0]);
+  }
+  console.log("changedBalanceUserId", changedBalanceUserId);
   const user = await pool.query("SELECT * FROM users WHERE user_id = $1", [
-    userId,
+    changedBalanceUserId,
   ]);
   if (currentNavState === NavStates.ChangeUserBalanceAmmount) {
     const amount = ctx.match[0];
     const user = await pool.query("SELECT * FROM users WHERE user_id = $1", [
-      userId,
+      changedBalanceUserId,
     ]);
     if (user.rows.length === 0) {
       return ctx.reply("Пользователь не найден", {
@@ -233,14 +238,20 @@ bot.hears(/^\d+$/, async (ctx) => {
         },
       });
     }
-    const userBalance = user.rows[0].balance;
-    const newBalance = userBalance + Number(amount);
+    const userBalanceF = user.rows[0].balance;
+    const userBalance = new Decimal(Number(userBalanceF));
+    const Useramount = new Decimal(Number(amount));
+    console.log(userBalance);
+    console.log("amonnt", Useramount);
+
+    const newBalance = Number(userBalance.plus(Useramount));
+    console.log(newBalance);
     await pool.query("UPDATE users SET balance = $1 WHERE user_id = $2", [
       newBalance,
-      userId,
+      changedBalanceUserId,
     ]);
     ctx.reply(
-      `Баланс пользователя ${userId} изменен на ${newBalance} USDT`,
+      `Баланс пользователя ${changedBalanceUserId} изменен на ${newBalance} USDT`,
       Markup.inlineKeyboard([
         [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
       ])
@@ -256,24 +267,23 @@ bot.hears(/^\d+$/, async (ctx) => {
     });
   }
 
-  ctx.editMessageText(
-    `*ID:* ${userId}\n` +
-      `*Баланс:* ${user.rows[0].balance} USDT\n\n` +
-      {
-        reply_markup: {
-          inline_keyboard: [
-            [
-              Markup.button.callback(
-                "💲 Изменить баланс",
-                Actions.ChangeUserBalanceAmmount
-              ),
-            ],
-            [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
+  ctx.sendMessage(
+    `*ID:* ${changedBalanceUserId}\n` +
+      `*Баланс:* ${user.rows[0].balance} USDT\n\n`,
+    {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            Markup.button.callback(
+              "💲 Изменить баланс",
+              Actions.ChangeUserBalanceAmmount
+            ),
           ],
-        },
-      }
+          [Markup.button.callback("🔙 Назад", Actions.UsersControl)],
+        ],
+      },
+    }
   );
-
   currentNavState = NavStates.ChangeUserBalanceConfirm;
 });
 
