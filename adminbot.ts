@@ -37,6 +37,10 @@ enum Actions {
   ChangeUserBalance = "change_user_balance",
   ChangeUserBalanceConfirm = "change_user_balance_confirm",
   ChangeUserBalanceAmmount = "change_user_balance_ammount",
+  AllTimeDeposits = "all_time_deposits",
+  AllUsersDeposits = "all_users_deposits",
+  Withdraws = "withdraws",
+  WithdrawsDepositsRatio = "withdraws_deposits_ratio",
 }
 enum NavStates {
   UsersControl = "users_control",
@@ -49,6 +53,10 @@ enum NavStates {
   ChangeUserBalance = "change_user_balance",
   ChangeUserBalanceConfirm = "change_user_balance_confirm",
   ChangeUserBalanceAmmount = "change_user_balance_ammount",
+  AllTimeDeposits = "all_time_deposits",
+  AllUsersDeposits = "all_users_deposits",
+  Withdraws = "withdraws",
+  WithdrawsDepositsRatio = "withdraws_deposits_ratio",
 }
 
 let currentNavState = NavStates.MainMenu;
@@ -107,6 +115,77 @@ bot.action(Actions.UsersControl, async (ctx) => {
 bot.action(Actions.BackToMainMenu, async (ctx) => {
   currentNavState = NavStates.MainMenu;
   ctx.editMessageText(`🚀 Админ панель 🚀`, mainMenu());
+});
+
+bot.action(Actions.PaymentsControl, async (ctx) => {
+  currentNavState = NavStates.PaymentsControl;
+  ctx.editMessageText(
+    `💳 Управление средствами`,
+    Markup.inlineKeyboard([
+      [Markup.button.callback("🔙 Назад", Actions.BackToMainMenu)],
+      [
+        Markup.button.callback(
+          "💲🌐 Депозиты за всё время",
+          Actions.AllTimeDeposits
+        ),
+      ],
+      [
+        Markup.button.callback(
+          "💲🧑‍🤝‍🧑 Депозиты пользователей общие",
+          Actions.AllUsersDeposits
+        ),
+      ],
+      [Markup.button.callback("👉 Выводы", Actions.Withdraws)],
+      [
+        Markup.button.callback(
+          "👨‍💻 Выводы/Депозиты",
+          Actions.WithdrawsDepositsRatio
+        ),
+      ],
+    ])
+  );
+});
+
+bot.action(Actions.AllTimeDeposits, async (ctx) => {
+  currentNavState = NavStates.AllTimeDeposits;
+  const deposits = await pool.query("SELECT * FROM deposits");
+  const totalDeposits = deposits.rows.reduce(
+    (sum, d) => sum + Number(d.amount || 0),
+    0
+  );
+  ctx.editMessageText(
+    `💲🌐 *Депозиты за всё время*\n\n` +
+      `*Всего депозитов:* ${totalDeposits} USDT` +
+      deposits.rows
+        .map((deposit) => {
+          // Форматируем дату
+          const formattedDate = new Date(deposit.created_at).toLocaleString(
+            "en-US",
+            {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          );
+
+          return (
+            `*ID:* ${deposit?.user_id}\n` +
+            `*Сумма:* ${deposit.amount} USDT\n` +
+            `*Дата создания:* ${formattedDate}\n` +
+            `\n━━━━━━━━━━━━━━━━━━\n`
+          );
+        })
+        .join("\n"),
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [Markup.button.callback("🔙 Назад", Actions.PaymentsControl)],
+        ],
+      },
+    }
+  );
 });
 
 bot.action(Actions.TodayUsers, async (ctx) => {

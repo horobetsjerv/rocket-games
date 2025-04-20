@@ -624,7 +624,6 @@ class Refferal {
       VALUES ($1, $2, $3)
       ON CONFLICT (user_id) DO UPDATE SET
         balance = ref_balances.balance + $3,
-        updated_at = NOW()
       RETURNING *;
           `,
         [userId, this.referral_link, amount]
@@ -1305,7 +1304,7 @@ bot.hears(/^\d+(\.\d+)?$/, async (ctx) => {
   if (user.navstate === NAVSTATES.GETDEPOSITAMOUNTMENU) {
     const depositAmount = parseFloat(ctx.message.text);
     try {
-      if (depositAmount < 0.5) {
+      if (depositAmount < 0.1) {
         return ctx.reply(
           "Минимальная сумма пополнения 0.5 USDT",
           Markup.inlineKeyboard([
