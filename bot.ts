@@ -614,8 +614,25 @@ class Refferal {
       console.error("Ошибка сохранения пользователя:", err);
     }
   }
-
+  /// ADD REFERRAL DEPOSIT TO REF_BALANCES
   async addRefferDeposit(amount: number, userId: string) {
+    try {
+      await query(
+        `
+      INSERT INTO ref_balances 
+        (user_id, referral_link, balance)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (user_id) DO UPDATE SET
+        balance = ref_balances.balance + $3,
+        updated_at = NOW()
+      RETURNING *;
+          `,
+        [userId, this.referral_link, amount]
+      );
+      console.log("Сохранен успешно");
+    } catch (error) {
+      console.error("Ошибка добавления депозита в реферальный баланс:", error);
+    }
     console.log("userId in Method", userId);
     const userIdToString = userId.toString();
     const referral = new Refferal(userIdToString, amount);
@@ -1125,6 +1142,14 @@ app.post("/webhook", async (req: any, res: any) => {
         console.log(user);
         reffer.addRefferDeposit(amount, user.referrer_id);
         console.log("Успешно добавлено рефералу", amount);
+      }
+      try {
+        await pool.query(
+          "INSERT INTO deposits (user_id, amount) VALUES ($1, $2)",
+          [userId, amount]
+        );
+      } catch (err) {
+        console.error("Ошибка при записи в таблицу deposits", err);
       }
       console.log(`Обновляем баланс пользователя ${userId} на ${amount}`);
       await user.updateBalance(amount);
