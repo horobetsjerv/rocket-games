@@ -124,7 +124,7 @@ async function initDatabase() {
       try {
         await pool.query(`CREATE TABLE IF NOT EXISTS ref_balances (
           id SERIAL PRIMARY KEY,
-          user_id BIGINT REFERENCES users(user_id),
+          user_id BIGINT REFERENCES users(user_id) UNIQUE,
           referral_link VARCHAR(100),
           balance NUMERIC(10, 2),
           created_at TIMESTAMP DEFAULT NOW()
