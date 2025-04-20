@@ -623,8 +623,7 @@ class Refferal {
         (user_id, referral_link, balance)
       VALUES ($1, $2, $3)
       ON CONFLICT (user_id) DO UPDATE SET
-        balance = ref_balances.balance + $3,
-      RETURNING *;
+        balance = ref_balances.balance + $3
           `,
         [userId, this.referral_link, amount]
       );
