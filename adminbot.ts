@@ -188,6 +188,58 @@ bot.action(Actions.AllTimeDeposits, async (ctx) => {
   );
 });
 
+bot.action(Actions.AllUsersDeposits, async (ctx) => {
+  currentNavState = NavStates.AllUsersDeposits;
+  const deposits = await pool.query("SELECT * FROM deposits");
+  const totalDeposits = deposits.rows.reduce(
+    (sum, d) => sum + Number(d.amount || 0),
+    0
+  );
+  const result = Object.values(
+    deposits.rows.reduce((acc, { user_id, amount }) => {
+      if (!acc[user_id]) {
+        acc[user_id] = { user_id, amount: 0 };
+      }
+      acc[user_id].amount += amount;
+      return acc;
+    }, {})
+  );
+
+  ctx.editMessageText(
+    `💲🧑‍🤝‍🧑 *Депозиты пользователей общие*\n\n` +
+      `*Всего депозитов:* ${totalDeposits} USDT` +
+      result
+        .map((deposit: any) => {
+          // Форматируем дату
+          const formattedDate = new Date(deposit.created_at).toLocaleString(
+            "en-US",
+            {
+              month: "short",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }
+          );
+
+          return (
+            `*ID:* ${deposit?.user_id}\n` +
+            `*Сумма:* ${deposit.amount} USDT\n` +
+            `*Дата создания:* ${formattedDate}\n` +
+            `\n━━━━━━━━━━━━━━━━━━\n`
+          );
+        })
+        .join("\n"),
+    {
+      parse_mode: "Markdown",
+      reply_markup: {
+        inline_keyboard: [
+          [Markup.button.callback("🔙 Назад", Actions.PaymentsControl)],
+        ],
+      },
+    }
+  );
+});
+
 bot.action(Actions.TodayUsers, async (ctx) => {
   currentNavState = NavStates.TodayUsers;
   const users = await pool.query(
