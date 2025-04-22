@@ -959,6 +959,7 @@ class UserSession {
     );
     const sum = res.rows.reduce((acc, row) => acc + parseFloat(row.bet), 0);
     const newSum = sum * user.refprocent;
+    console.log("userreflink", user.referral_link);
     console.log(res.rows);
 
     return newSum;
