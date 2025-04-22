@@ -957,7 +957,7 @@ class UserSession {
       user.userId,
     ]);
     const sum = res.rows.reduce((acc, row) => acc + parseFloat(row.balance), 0);
-    const newSum = res.rows[0].balance * user.refprocent;
+    const newSum = res.rows[0].balance / user.refprocent;
 
     return newSum;
   }
@@ -983,7 +983,7 @@ class UserSession {
     await ctx.editMessageText(
       `Ваши рефералы:
     
-    💸 *Сумма рефералов:* \`${referrals} USDT\`
+💸 *Сумма рефералов:* \`${referrals} USDT\`
     `,
       {
         parse_mode: "Markdown",
