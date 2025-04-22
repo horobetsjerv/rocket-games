@@ -961,6 +961,7 @@ class UserSession {
     const newSum = sum * user.refprocent;
     console.log("userreflink", user.referral_link);
     console.log(res.rows);
+    console.log(res);
 
     return newSum;
   }
