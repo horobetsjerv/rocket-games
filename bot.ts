@@ -957,9 +957,7 @@ class UserSession {
       user.userId,
     ]);
     const sum = res.rows.reduce((acc, row) => acc + parseFloat(row.balance), 0);
-    const newSum = sum * user.refprocent;
-    console.log("userreflink", user.userId);
-    console.log(res.rows);
+    const newSum = res.rows[0].balance * user.refprocent;
 
     return newSum;
   }
