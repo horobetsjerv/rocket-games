@@ -956,11 +956,10 @@ class UserSession {
     const res = await query("SELECT * FROM ref_balances WHERE user_id = $1", [
       user.userId,
     ]);
-    const sum = res.rows.reduce((acc, row) => acc + parseFloat(row.bet), 0);
+    const sum = res.rows.reduce((acc, row) => acc + parseFloat(row.balance), 0);
     const newSum = sum * user.refprocent;
     console.log("userreflink", user.userId);
     console.log(res.rows);
-    console.log(res);
 
     return newSum;
   }
